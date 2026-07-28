@@ -1,6 +1,9 @@
 package com.example.biblioteca.service;
 
+import com.example.biblioteca.config.TokenService;
+import com.example.biblioteca.dto.request.UsuarioLoginRequest;
 import com.example.biblioteca.dto.request.UsuarioRequest;
+import com.example.biblioteca.dto.response.UsuarioLoginResponse;
 import com.example.biblioteca.dto.response.UsuarioResponse;
 import com.example.biblioteca.entity.Usuario;
 import com.example.biblioteca.exception.EmailAlreadyExistsException;
@@ -9,6 +12,10 @@ import com.example.biblioteca.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +26,19 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
+    private final AuthenticationManager manager;
+    private final TokenService tokenService;
+
+    @Transactional
+    public UsuarioLoginResponse login(UsuarioLoginRequest request){
+        UsernamePasswordAuthenticationToken userAndPass = new UsernamePasswordAuthenticationToken(request.email() , request.senha());
+        Authentication authentication = manager.authenticate(userAndPass);
+
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        String token = tokenService.generateToken(usuario);
+
+        return new UsuarioLoginResponse(token);
+    }
 
     //CADASTRAR
     @Transactional

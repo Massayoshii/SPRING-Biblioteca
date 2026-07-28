@@ -1,6 +1,8 @@
 package com.example.biblioteca.controller;
 
+import com.example.biblioteca.dto.request.UsuarioLoginRequest;
 import com.example.biblioteca.dto.request.UsuarioRequest;
+import com.example.biblioteca.dto.response.UsuarioLoginResponse;
 import com.example.biblioteca.dto.response.UsuarioResponse;
 import com.example.biblioteca.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,12 @@ public class AuthController {
     public ResponseEntity<UsuarioResponse> registar(@RequestBody UsuarioRequest request) {
         UsuarioResponse response = service.cadastrar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioLoginResponse> login(@RequestBody UsuarioLoginRequest request){
+        UsuarioLoginResponse response = service.login(request);
+        return ResponseEntity.ok(response);
     }
 }
 
