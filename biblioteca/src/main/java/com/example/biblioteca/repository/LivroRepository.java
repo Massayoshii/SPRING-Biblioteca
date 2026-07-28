@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface LivroRepository extends JpaRepository<Livro , Long> {
     List<LivroResponse> findByTitulo(String titulo);
-    List<LivroResponse> findByAutor(Autor autor);
+    List<LivroResponse> findByAutor(Long autorId);
 
     boolean existsByIsbn(@NotBlank(message = "isbn é obrigatorio") @Size(min = 10 , max = 13) String isbn);
 

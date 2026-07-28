@@ -52,8 +52,8 @@ public class LivroService {
 
     //BUSCAR POR AUTOR
     @Transactional(readOnly = true)
-    public List<LivroResponse> buscarPorAutor(Autor autor){
-        return repository.findByAutor(autor);
+    public List<LivroResponse> buscarPorAutor(Long autorId){
+        return repository.findByAutor(autorId);
     }
 
     //ATUALIZAR
