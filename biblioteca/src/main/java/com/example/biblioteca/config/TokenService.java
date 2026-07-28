@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.biblioteca.entity.Usuario;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @Service
 public class TokenService {
 
+    @Value("${api.security.token.secret}")
     private String secret;
 
     public String generateToken(Usuario usuario){
