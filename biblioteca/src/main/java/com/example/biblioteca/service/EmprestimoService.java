@@ -5,6 +5,8 @@ import com.example.biblioteca.dto.response.EmprestimoResponse;
 import com.example.biblioteca.entity.Emprestimo;
 import com.example.biblioteca.entity.Livro;
 import com.example.biblioteca.entity.Usuario;
+import com.example.biblioteca.exception.BusinessException;
+import com.example.biblioteca.exception.ResourceNotFoundException;
 import com.example.biblioteca.repository.EmprestimoRepository;
 import com.example.biblioteca.repository.LivroRepository;
 import com.example.biblioteca.repository.UsuarioRepository;
@@ -28,13 +30,13 @@ public class EmprestimoService {
     @Transactional
     public EmprestimoResponse emprestar(EmprestimoRequest request){
         Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario nao encontrado com o id " + request.usuarioId()));
 
         Livro livro = livroRepository.findById(request.livroId())
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new ResourceNotFoundException("Livro nao encontrado com o id " + request.livroId()));
 
         if (livro.getQuantidade() <= 0 ){
-            throw new RuntimeException();
+            throw new BusinessException("Livro indisponível para empréstimo");
         }
 
         Emprestimo emprestimo = new Emprestimo();
@@ -52,7 +54,7 @@ public class EmprestimoService {
         Emprestimo emprestimo = buscarEntidadePorId(id);
 
         if (emprestimo.isDevolucao()){
-            throw new RuntimeException();
+            throw new BusinessException("Livro ja foi devolvido");
         }
 
         Livro livro = emprestimo.getLivro();
@@ -90,7 +92,7 @@ public class EmprestimoService {
     public void excluir(Long id){
         Emprestimo emprestimo = buscarEntidadePorId(id);
         if (!emprestimo.isDevolucao()){
-            throw new RuntimeException();
+            throw new BusinessException("Livro nao foi devolvido no momento");
         }
         emprestimoRepository.delete(emprestimo);
     }
@@ -98,6 +100,6 @@ public class EmprestimoService {
 
     private Emprestimo buscarEntidadePorId(Long id){
         return emprestimoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException());
+                () -> new ResourceNotFoundException("Emprestimo nao encontrado com o id " + id));
     }
 }

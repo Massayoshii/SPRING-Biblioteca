@@ -4,6 +4,9 @@ import com.example.biblioteca.dto.request.LivroRequest;
 import com.example.biblioteca.dto.response.LivroResponse;
 import com.example.biblioteca.entity.Autor;
 import com.example.biblioteca.entity.Livro;
+import com.example.biblioteca.exception.BusinessException;
+import com.example.biblioteca.exception.IsbnAlreadyExistsException;
+import com.example.biblioteca.exception.ResourceNotFoundException;
 import com.example.biblioteca.repository.LivroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +27,7 @@ public class LivroService {
     @Transactional
     public LivroResponse cadastrar(LivroRequest request){
         if (repository.existsByIsbn(request.isbn())){
-            throw new RuntimeException();
+            throw new IsbnAlreadyExistsException("Livro ja cadastrado com o ISBN " + request.isbn());
         }
 
         Livro livro = request.toEntity();
@@ -63,7 +66,7 @@ public class LivroService {
         Optional<Livro> livroIsbn = repository.findByIsbn(request.isbn());
 
         if (livroIsbn.isPresent() && !livroIsbn.get().getId().equals(livro.getId())){
-            throw new RuntimeException();
+            throw new IsbnAlreadyExistsException("Livro ja cadastrado com o ISBN " + request.isbn());
         }
 
         request.preencher(livro);
@@ -82,7 +85,7 @@ public class LivroService {
     public LivroResponse consultarDisponibilidade(Long id){
         Livro livro = buscarEntidadePorId(id);
         if (livro.getQuantidade() == 0){
-            throw new RuntimeException();
+            throw new BusinessException("Livro nao esta disponivel no momento");
         }
 
         return LivroResponse.fromEntity(livro);
@@ -94,6 +97,6 @@ public class LivroService {
 
     private Livro buscarEntidadePorId(Long id){
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new ResourceNotFoundException("Livro nao encontrado com o id " + id));
     }
 }

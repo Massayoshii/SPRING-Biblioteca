@@ -3,6 +3,8 @@ package com.example.biblioteca.service;
 import com.example.biblioteca.dto.request.UsuarioRequest;
 import com.example.biblioteca.dto.response.UsuarioResponse;
 import com.example.biblioteca.entity.Usuario;
+import com.example.biblioteca.exception.EmailAlreadyExistsException;
+import com.example.biblioteca.exception.ResourceNotFoundException;
 import com.example.biblioteca.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +24,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse cadastrar(UsuarioRequest request){
         if (repository.existsByEmail(request.email())){
-            throw new RuntimeException();
+            throw new EmailAlreadyExistsException("Usuario ja cadastrado com o email "+ request.email());
         }
 
         Usuario novoUsuario = request.toEntity();
@@ -47,7 +49,7 @@ public class UsuarioService {
         Usuario usuario = buscarEntidadePorId(id);
         Optional<Usuario> userEmail = repository.findByEmail(request.email());
         if (userEmail.isPresent() && !userEmail.get().getId().equals(usuario.getId())){
-            throw new RuntimeException();
+            throw new EmailAlreadyExistsException("Usuario ja cadastrado com o email "+ request.email());
         }
 
         request.preencher(usuario);
@@ -65,6 +67,6 @@ public class UsuarioService {
 
     private Usuario buscarEntidadePorId(Long id){
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario nao encontrado com o id " + id));
     }
 }

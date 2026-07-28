@@ -3,6 +3,7 @@ package com.example.biblioteca.service;
 import com.example.biblioteca.dto.request.AutorRequest;
 import com.example.biblioteca.dto.response.AutorResponse;
 import com.example.biblioteca.entity.Autor;
+import com.example.biblioteca.exception.ResourceNotFoundException;
 import com.example.biblioteca.repository.AutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,6 +55,6 @@ public class AutorService {
 
     private Autor buscarEntidadePorId(Long id){
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new ResourceNotFoundException("Autor nao encontrado com o id "+ id));
     }
 }
